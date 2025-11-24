@@ -1,1 +1,1 @@
-# tables_guide_vision
+# Tables Guide Vision: Learning to See the Heart through Tabular Data (WACV2026)
