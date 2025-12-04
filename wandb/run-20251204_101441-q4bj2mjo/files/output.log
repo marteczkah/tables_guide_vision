@@ -1,0 +1,52 @@
+TRAINING
+augmentations true
+/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/torch/utils/data/dataloader.py:627: UserWarning: This DataLoader will create 16 worker processes in total. Our suggested max number of worker in current system is 8, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+1
+EPOCH:  0
+  0%|                                                 | 0/624 [00:03<?, ?it/s]
+Traceback (most recent call last):
+  File "/ictstr01/home/iml/marta.hasny/tables_guide_vision/train_tgv.py", line 120, in <module>
+    main()
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/click/core.py", line 1462, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/click/core.py", line 1383, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/click/core.py", line 1246, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/click/core.py", line 814, in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ictstr01/home/iml/marta.hasny/tables_guide_vision/train_tgv.py", line 100, in main
+    for data in tqdm(train_loader):
+                ^^^^^^^^^^^^^^^^^^
+  File "/home/iml/marta.hasny/.local/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 734, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 1516, in _next_data
+    return self._process_data(data, worker_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 1551, in _process_data
+    data.reraise()
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/torch/_utils.py", line 769, in reraise
+    raise exception
+KeyError: Caught KeyError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/torch/utils/data/_utils/worker.py", line 349, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/lib/python3.12/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+            ~~~~~~~~~~~~^^^^^
+  File "/ictstr01/home/iml/marta.hasny/tables_guide_vision/dataset/MRContrastiveDatasetH5.py", line 52, in __getitem__
+    categorical = torch.tensor(self.encode_categorical(metadata_row), dtype=torch.float32).unsqueeze(0)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ictstr01/home/iml/marta.hasny/tables_guide_vision/dataset/MRContrastiveDatasetH5.py", line 89, in encode_categorical
+    ind = NUMERICAL_MAPPING[key][value]
+          ~~~~~~~~~~~~~~~~~^^^^^
+KeyError: 'I25_premr'

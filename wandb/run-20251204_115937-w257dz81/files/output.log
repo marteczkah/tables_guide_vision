@@ -1,0 +1,7 @@
+TRAINING
+augmentations true
+1
+EPOCH:  0
+  2%|▌                                     | 10/624 [01:41<1:43:53, 10.15s/it]
+
+Aborted!

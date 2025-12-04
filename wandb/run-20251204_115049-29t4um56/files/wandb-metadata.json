@@ -1,0 +1,99 @@
+{
+  "os":  "Linux-5.14.0-570.25.1.el9_6.x86_64-x86_64-with-glibc2.34",
+  "python":  "CPython 3.12.11",
+  "startedAt":  "2025-12-04T10:50:49.140691Z",
+  "args":  [
+    "-p",
+    "/lustre/groups/shared/ukbb-87065-ext/users/marta.hasny/train.h5",
+    "-v",
+    "/lustre/groups/shared/ukbb-87065-ext/users/marta.hasny/val.h5",
+    "-s",
+    "try"
+  ],
+  "program":  "/ictstr01/home/iml/marta.hasny/tables_guide_vision/train_tgv.py",
+  "codePath":  "train_tgv.py",
+  "codePathLocal":  "train_tgv.py",
+  "git":  {
+    "remote":  "https://github.com/marteczkah/tables_guide_vision.git",
+    "commit":  "52fa84b588fa0b2617a87a54d2883d70df583ddc"
+  },
+  "email":  "martahasny@gmail.com",
+  "root":  "/ictstr01/home/iml/marta.hasny/tables_guide_vision",
+  "host":  "gpusrv22.scidom.de",
+  "executable":  "/ictstr01/home/iml/marta.hasny/tools/apps/mamba/envs/tab/bin/python",
+  "cpu_count":  32,
+  "cpu_count_logical":  64,
+  "gpu":  "Tesla V100S-PCIE-32GB",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "107307073536",
+      "used":  "53450149888"
+    }
+  },
+  "memory":  {
+    "total":  "404842905600"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "Tesla V100S-PCIE-32GB",
+      "memoryTotal":  "34359738368",
+      "cudaCores":  5120,
+      "architecture":  "Volta",
+      "uuid":  "GPU-5f72cdce-cad0-494a-810e-d5f96c4d1b19"
+    }
+  ],
+  "cudaVersion":  "12.9",
+  "slurm":  {
+    "cluster_name":  "algoritam",
+    "conf":  "/etc/slurm/slurm.conf",
+    "cpus_on_node":  "8",
+    "gpus":  "1",
+    "gpus_on_node":  "1",
+    "gtids":  "0",
+    "job_account":  "iml",
+    "job_cpus_per_node":  "8",
+    "job_end_time":  "1764886296",
+    "job_gid":  "54000",
+    "job_gpus":  "1",
+    "job_id":  "32799854",
+    "job_name":  "interactive",
+    "job_nodelist":  "gpusrv22",
+    "job_num_nodes":  "1",
+    "job_partition":  "interactive_gpu_p",
+    "job_qos":  "interactive_gpu",
+    "job_start_time":  "1764843096",
+    "job_uid":  "1000292",
+    "job_user":  "marta.hasny",
+    "jobid":  "32799854",
+    "launch_node_ipaddr":  "10.233.0.200",
+    "localid":  "0",
+    "mem_per_node":  "20480",
+    "mpi_type":  "none",
+    "nnodes":  "1",
+    "nodeid":  "0",
+    "nodelist":  "gpusrv22",
+    "oom_kill_step":  "0",
+    "prio_process":  "0",
+    "procid":  "0",
+    "pty_port":  "62018",
+    "pty_win_col":  "78",
+    "pty_win_row":  "24",
+    "srun_comm_host":  "10.233.0.200",
+    "srun_comm_port":  "60209",
+    "step_id":  "4294967290",
+    "step_launcher_port":  "60209",
+    "step_nodelist":  "gpusrv22",
+    "step_num_nodes":  "1",
+    "step_num_tasks":  "1",
+    "step_tasks_per_node":  "1",
+    "stepid":  "4294967290",
+    "submit_dir":  "/ictstr01/home/iml/marta.hasny",
+    "submit_host":  "hpc-submit03gui.scidom.de",
+    "task_pid":  "3645613",
+    "tasks_per_node":  "8",
+    "topology_addr":  "gpusrv22",
+    "topology_addr_pattern":  "node"
+  },
+  "writerId":  "arseqj4zgczwbxij10kbvcu6igk5nuna"
+}
