@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from resnet2d import ResNet2d
-from resnet3d import ResNet3d
+from .resnet2d import ResNet2d
+from .resnet3d import ResNet3d
 
 class ClassificationModel(nn.Module):
     def __init__(self, backbone_dim, num_classes, freeze_backbone=False, backbone_path="", dim=3):
