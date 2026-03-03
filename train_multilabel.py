@@ -32,8 +32,10 @@ wandb.init(
 @click.option('--model_path', '-m', help='Path to the model you want to use to generate representation.', required=True)
 @click.option('--test', help='Whether you want to test the model after training.', required=False, default=False, type = bool)
 @click.option('--h5_test', help='If you want to test the model, declare the path to the h5 file.', required=False, default="", type = str)
+@click.option('--lr', help='Learning rate.', required=False, default=3e-4, type = float)
+@click.option('--num_workers', '-w', help='Number of workers you want to use.', required=False, default=8, type = int)
 
-def main(h5_path_train, csv_path_train_filter, store, h5_path_val, batch_size, epochs, restart_training, previous_epochs, frozen, model_path, test, h5_test):
+def main(h5_path_train, csv_path_train_filter, store, h5_path_val, batch_size, epochs, lr, restart_training, previous_epochs, frozen, model_path, test, h5_test, num_workers):
     print("TRAINING MULTILABEL CLASSIFICATION")
     set_seed()
     # setup wandb to log the training information
@@ -57,13 +59,13 @@ def main(h5_path_train, csv_path_train_filter, store, h5_path_val, batch_size, e
         train_data,
         batch_size = batch_size,
         shuffle = True,
-        num_workers=4
+        num_workers=num_workers
     )
     val_loader = DataLoader(
         val_data,
         batch_size = batch_size,
         shuffle = False,
-        num_workers=4
+        num_workers=num_workers
     )
 
     classifier = ClassificationModel(
@@ -88,11 +90,6 @@ def main(h5_path_train, csv_path_train_filter, store, h5_path_val, batch_size, e
         classifier.to(device)
     else:
         device = torch.device("cpu")
-   
-    if frozen:
-        lr = 3e-3
-    else:
-        lr = 3e-4
 
     optimizer = torch.optim.AdamW(classifier.parameters(), lr=lr, weight_decay=1e-4)
     criterion = nn.BCEWithLogitsLoss()
@@ -167,6 +164,7 @@ def main(h5_path_train, csv_path_train_filter, store, h5_path_val, batch_size, e
         loader = DataLoader(
             test_data,
             batch_size = batch_size,
+            num_workers=num_workers
         )
         for data in tqdm(loader):
             logits = classifier(data['scan'].float().to(device))

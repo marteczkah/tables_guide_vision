@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from dataset.MRContrastiveDatasetH5 import MRContrastiveDatasetH5
 from dataset.MRContrastiveFilterDataset import MRContrastiveFilterDataset
+from dataset.DVMRegressionDataset import DVMRegressionsDataset
 from models.regression_model import RegressionModel
 import click
 import wandb
@@ -19,22 +20,26 @@ wandb.init(
 )
 
 @click.command()
-@click.option('--h5_path_train', '-p', help='Path to the csv file with train data information.', required=True)
-@click.option('--csv_path_train_filter', '-t', help='Path to the csv file with train data information.', required=True)
-@click.option('--h5_path_val', '-v', help='Path to the csv file with val data information.', required=True)
-@click.option('--h5_path_test', help='Path to the csv file with val data information.', required=False, default="")
+@click.option('--h5_path_train', '-p', help='h5 file for UKBB, csv file for DVM (train).', required=True)
+@click.option('--dvm_train_labels', help='.pt file with DVM train labels (DVM only)', required=False, default='')
+@click.option('--csv_path_train_filter', '-t', help='CSV file with the subset of data used for the regression training (UKBB only).', required=False, default='')
+@click.option('--h5_path_val', '-v', help='h5 file for UKBB, csv file for DVM (val).', required=True)
+@click.option('--dvm_val_labels', help='.pt file with DVM validation labels (DVM only)', required=False, default='')
+@click.option('--h5_path_test', help='h5 file for UKBB, csv file for DVM (test).', required=False, default="")
+@click.option('--dvm_test_labels', help='.pt file with DVM test labels (DVM only)', required=False, default='')
 @click.option('--batch_size', '-b', help='Traning batch size.', default = 512,type = int)
 @click.option('--epochs', '-e', help='Number of epochs.', default = 50, type = int)
 @click.option('--store', '-s', help='Where you want to store the models and results.', required=True, type = str)
 @click.option('--previous_epochs', '-u', help='Number of epochs in previous training.', required=False, default=0, type = int)
 @click.option('--frozen', '-f', help='Whether the backbone should be frozen.', required=False, default=False, type = bool)
 @click.option('--attribute', '-a', help='Attribute to be used for regression.', required=True, type = str)
-@click.option('--model_path', '-m', help='Path to the model you want to use to generate representation.', required=True)
+@click.option('--model_path', '-m', help='Path to the model you want to use to generate representation.', required=False, default="")
 @click.option('--dim', '-d', help='Image size.', required=False, default=3, type = int)
-@click.option('--test', help='Image size.', required=False, default=False, type = bool)
+@click.option('--test', help='Whether to test the model at the end of the training.', required=False, default=False, type = bool)
 @click.option('--num_workers', '-w', help='Number of workers you want to use.', required=False, default=8, type = int)
+@click.option('--lr', help='Learning rate.', required=False, default=3e-4, type = float)
 
-def main(h5_path_train, h5_path_test, csv_path_train_filter, store, h5_path_val, batch_size, epochs, previous_epochs, frozen, attribute, model_path, dim, test, num_workers):
+def main(h5_path_train, h5_path_test, csv_path_train_filter, store, lr, h5_path_val, dvm_train_labels, dvm_val_labels, dvm_test_labels, batch_size, epochs, previous_epochs, frozen, attribute, model_path, dim, test, num_workers):
     print("TRAINING")
     set_seed()
     # setup wandb to log the training information
@@ -44,16 +49,29 @@ def main(h5_path_train, h5_path_test, csv_path_train_filter, store, h5_path_val,
     regres_folder = os.path.join(store, "regression")
     os.makedirs(regres_folder, exist_ok=True)
     
-    train_data = MRContrastiveFilterDataset(
-        h5_path_train, csv_path_train_filter,
-        augmentation_rate=0.0, 
-        attribute=attribute
-    )
-    val_data = MRContrastiveDatasetH5(
-        h5_path_val, 
-        augmentation_rate=-1, 
-        attribute=attribute
-    )
+    if dim == 2:
+        train_data = DVMRegressionsDataset(
+            h5_path_train, 
+            dvm_train_labels, 
+            augmentation_rate=0.95
+        )
+        val_data = DVMRegressionsDataset(
+            h5_path_val, 
+            dvm_val_labels, 
+            augmentation_rate=0.0
+        )
+    else:
+        train_data = MRContrastiveFilterDataset(
+            h5_path_train, 
+            csv_path_train_filter,
+            augmentation_rate=0.0, 
+            attribute=attribute
+        )
+        val_data = MRContrastiveDatasetH5(
+            h5_path_val, 
+            augmentation_rate=-1, 
+            attribute=attribute
+        )
     
     train_loader = DataLoader(
         train_data,
@@ -86,7 +104,7 @@ def main(h5_path_train, h5_path_test, csv_path_train_filter, store, h5_path_val,
     else:
         device = torch.device("cpu")
    
-    optimizer = torch.optim.AdamW(regressor.parameters(), lr=3e-4)
+    optimizer = torch.optim.AdamW(regressor.parameters(), lr=lr)
     criterion = nn.HuberLoss()
     evaluation_criterion = nn.L1Loss()
     best_mae = float('inf')
@@ -127,14 +145,23 @@ def main(h5_path_train, h5_path_test, csv_path_train_filter, store, h5_path_val,
         print('Running test...')
         state_dict = torch.load(os.path.join(regres_folder, 'best.pth'), map_location=device)
         regressor.load_state_dict(state_dict)
-        regressor.eval()        
-        test_data = MRContrastiveDatasetH5(
-            h5_path_test, 
-            augmentation_rate=-1, 
-            attribute=attribute)
+        regressor.eval()   
+        if dim == 2:
+            val_data = DVMRegressionsDataset(
+                h5_path_test, 
+                dvm_test_labels, 
+                augmentation_rate=0.0
+            )
+        else:     
+            test_data = MRContrastiveDatasetH5(
+                h5_path_test, 
+                augmentation_rate=-1, 
+                attribute=attribute
+            )
         loader = DataLoader(
             test_data,
             batch_size = batch_size,
+            num_workers=num_workers
         )
         for data in tqdm(loader):
             out = regressor(data['scan'].float().to(device))
@@ -143,7 +170,7 @@ def main(h5_path_train, h5_path_test, csv_path_train_filter, store, h5_path_val,
         mae = np.mean(np.array(test_mae))
         print(mae)
         wandb.log({
-            "test_auc": mae
+            "test_mae": mae
         })
 
 if __name__ == '__main__':
