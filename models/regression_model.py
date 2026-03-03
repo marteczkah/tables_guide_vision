@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
-from resnet2d import ResNet2d
-from resnet3d import ResNet3d
+from .resnet2d import ResNet2d
+from .resnet3d import ResNet3d
 
 class RegressionModel(nn.Module):
-    def __init__(self, backbone_dim, bias, all, backbone_path="", freeze_backbone=False, dim=3):
+    def __init__(self, backbone_dim, bias, backbone_path="", freeze_backbone=False, dim=3):
         super().__init__()
         self.dim = dim
         self.get_model()
@@ -24,7 +24,6 @@ class RegressionModel(nn.Module):
             torch.nn.Linear(backbone_dim, 1)
         )
         self.regressor[-1].bias.data[0] = bias
-        self.all = all
     
     def forward(self, input):
         _, representation = self.backbone(input)

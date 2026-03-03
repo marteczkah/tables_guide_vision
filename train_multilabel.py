@@ -16,7 +16,7 @@ torch.cuda.empty_cache()
 
 ROOT_PATH = "./results"
 wandb.init(
-   project = "tgv_downsteam"
+   project = "tgv_multilabel"
 )
 
 @click.command()
@@ -28,7 +28,7 @@ wandb.init(
 @click.option('--store', '-s', help='Where you want to store the models and results.', required=True, type = str)
 @click.option('--previous_epochs', '-u', help='Number of epochs in previous training.', required=False, default=0, type = int)
 @click.option('--restart_training', '-r', help='Path to the model you want to train further.', required=False, default="", type = str)
-@click.option('--frozen', '-f', help='Whether the backbone should be frozen.', required=False, default=True, type = bool)
+@click.option('--frozen', '-f', help='Whether the backbone should be frozen.', required=False, default=False, type = bool)
 @click.option('--model_path', '-m', help='Path to the model you want to use to generate representation.', required=True)
 @click.option('--test', help='Whether you want to test the model after training.', required=False, default=False, type = bool)
 @click.option('--h5_test', help='If you want to test the model, declare the path to the h5 file.', required=False, default="", type = str)

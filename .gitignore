@@ -4,3 +4,4 @@ wandb/
 __pycache__/
 *.pyc
 results/
+sbatch_outputs/
