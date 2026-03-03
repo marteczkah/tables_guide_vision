@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from dataset.MRContrastiveDatasetH5 import MRContrastiveDatasetH5
+from dataset.DVMContrastiveDataset import DVMContrastiveDataset
 from losses.losses import MultiplePairsContrastiveLoss
 import click
 import wandb
@@ -20,7 +21,9 @@ wandb.init(
 
 @click.command()
 @click.option('--csv_path_train', '-p', help='Path to the csv file with train data information.', required=True)
+@click.option('--tabular_train_path', help='Path to the csv file with tabular data training information (DVM only).', required=False, default='')
 @click.option('--csv_path_val', '-v', help='Path to the csv file with val data information.', required=True)
+@click.option('--tabular_val_path', help='Path to the csv file with tabular data validation information (DVM only).', required=False, default='')
 @click.option('--batch_size', '-b', help='Traning batch size.', default = 512,type = int)
 @click.option('--epochs', '-e', help='Number of epochs.', default = 10, type = int)
 @click.option('--temperature', '-t', help='Loss temperature.', default = 0.1, type = float)
@@ -31,8 +34,9 @@ wandb.init(
 @click.option('--thres', '-h', help='What threshold is the training on.', required=False, default=0.05, type = float)
 @click.option('--augment', help='Percent of augmentations.', required=False, default=0.95, type = float)
 @click.option('--data_dim', '-d', help='Data type: 2 for 2D (dvm) or 3 for 3D (cardiac mr).', required=False, default=3, type = int)
+@click.option('--num_workers', '-w', help='Number of workers.', required=False, default=8, type = int)
 
-def main(csv_path_train, store, csv_path_val, batch_size, epochs, temperature, restart_training, previous_epochs, lr, thres, augment, data_dim):
+def main(csv_path_train, tabular_train_path, store, csv_path_val, tabular_val_path, batch_size, epochs, temperature, restart_training, previous_epochs, lr, thres, augment, data_dim, num_workers):
     print("TRAINING")
     set_seed()
     store = os.path.join(ROOT_PATH, store)
@@ -46,25 +50,41 @@ def main(csv_path_train, store, csv_path_val, batch_size, epochs, temperature, r
     else:
         augment_org = False
 
-    train_loader = DataLoader(
-        MRContrastiveDatasetH5(csv_path_train, augment_org=augment_org, augmentation_rate=augment),
-        batch_size = batch_size,
-        shuffle = True,
-        drop_last=True,
-        num_workers=2
-    )
-    val_loader = DataLoader(
-        MRContrastiveDatasetH5(csv_path_val, augment_org=False, augmentation_rate=-1),
-        batch_size = batch_size,
-        shuffle = True,
-        drop_last=True,
-        num_workers=2
-    )
+    if data_dim == 2:
+        train_loader = DataLoader(
+            DVMContrastiveDataset(tabular_train_path, csv_path_train, augmentation_rate=0.95),
+            batch_size = batch_size,
+            shuffle = True,
+            drop_last=True,
+            num_workers=num_workers
+        )
+        val_loader = DataLoader(
+            DVMContrastiveDataset(tabular_val_path, csv_path_val, augmentation_rate=-1),
+            batch_size = batch_size,
+            shuffle = False,
+            drop_last=True,
+            num_workers=num_workers
+        )
+    else:
+        train_loader = DataLoader(
+            MRContrastiveDatasetH5(csv_path_train, augment_org=augment_org, augmentation_rate=augment),
+            batch_size = batch_size,
+            shuffle = True,
+            drop_last=True,
+            num_workers=num_workers
+        )
+        val_loader = DataLoader(
+            MRContrastiveDatasetH5(csv_path_val, augment_org=False, augmentation_rate=-1),
+            batch_size = batch_size,
+            shuffle = True,
+            drop_last=True,
+            num_workers=num_workers
+        )
 
     if data_dim == 3:
         model = ResNet3d()
     else:
-        model = ResNet2d
+        model = ResNet2d()
 
     if restart_training:
         models_paths = os.listdir(model_folder)
@@ -92,6 +112,8 @@ def main(csv_path_train, store, csv_path_val, batch_size, epochs, temperature, r
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     criterion = MultiplePairsContrastiveLoss(temperature=temperature, similarity_thr=thres, device=device)
 
+    best_val = float('inf')
+
     for epoch in range(previous_epochs, epochs):
         epoch_loss = []
         epoch_val_loss = []
@@ -106,7 +128,7 @@ def main(csv_path_train, store, csv_path_val, batch_size, epochs, temperature, r
             epoch_loss.append(loss.detach().cpu().numpy())
             wandb.log({"batch_train_loss: ": loss})
         wandb.log({"epoch_train_loss: ": np.mean(np.array(epoch_loss))})
-        torch.save(model.state_dict(), os.path.join(model_folder, 'model_state_dict' +str(epoch) +'.pth'))
+        torch.save(model.state_dict(), os.path.join(model_folder, 'last.pth'))
 
         for data in tqdm(val_loader):
             with torch.no_grad():
@@ -115,6 +137,11 @@ def main(csv_path_train, store, csv_path_val, batch_size, epochs, temperature, r
                 epoch_val_loss.append(val_loss.detach().cpu().numpy())
                 wandb.log({"batch_val_loss": val_loss})
         wandb.log({"epoch_val_loss": np.mean(np.array(epoch_val_loss))})
+
+        if np.mean(np.array(epoch_val_loss)) < best_val:
+            best_val = np.mean(np.array(epoch_val_loss))
+            torch.save(model.state_dict(), os.path.join(model_folder, 'best.pth'))
+
 
 if __name__ == '__main__':
     main()
