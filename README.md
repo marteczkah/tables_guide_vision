@@ -21,6 +21,18 @@ This is the official repository of the WACV2026 paper _Tables Guide Vision: Lear
 ### Data
 Our codebase provides the code to run TGV with twa datasets that were used in the paper, UK Biobank and DVM. UK Biobank is semi-private dataset, you can apply for access <a href='https://www.ukbiobank.ac.uk/use-our-data/apply-for-access/'>here</a>. DVM is open-access and can be found under this <a href='https://deepvisualmarketing.github.io'>link</a>. We provide the code for preprocessing of DVM in ```data_prep/prep_dvm.ipynb```. The code for preprocessing UKBB will be uploaded soon, meanwhile we provide the code used to generate h5 files that we used for training given csv files with the tabular data and image paths. 
 
+### Pretraining
+To run the pretraining using TGV use script ```train_tgv.py```, which supports pretraining using both DVM (use flag ```-d 2```) and UKBB (use flag ```-d 3```). A sample command including best hyperparameters from the paper for UKBB would be:
+```
+python train_tgv.py -p train.h5 -v val.h5 -b 512 -e 10 -t 0.1 -s 'tgv_ukbb' -l 1e-3 -h 0.05 --augment 0.0 -d 3
+```
+
+And for DVM:
+```
+python train_tgv.py -p train_paths_all_views.pt --tabular_train_path dvm_features_train_noOH_all_views_physical_labeled.csv -v val_paths_all_views.pt --tabular_val_path dvm_features_train_noOH_all_views_physical_labeled.csv -b 512 -e 500 -t 0.1 -s 'tgv_dvm' -l 1e-4 -h 0.1 --augment 0.95 -d 2
+```
+
+
 
 
 
