@@ -8,7 +8,7 @@ This is the official repository of the WACV2026 paper _Tables Guide Vision: Lear
 
 ```bibtex
 @inproceedings{hasny2026tables,
-  title={Tables guide vision: Learning to see the heart through tabular data},
+  title={Tables Guide Vision: Learning to See the Heart Through Tabular Data},
   author={Hasny, Marta and Di Folco, Maxime and Bressem, Keno and Schnabel, Julia},
   booktitle={Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision},
   pages={1716--1725},
