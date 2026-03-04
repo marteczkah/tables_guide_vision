@@ -46,5 +46,6 @@ Dataset | DVM | Cardiac
 --- | --- | ---
 Checkpoints | [Download](https://drive.google.com/file/d/1qU1eZV7xHNSPK-nGhXakKy5MHn867POj/view?usp=sharing) | Pending approval.
 
-
-
+## Acknowledgments
+We thank those repositories for their great work:
+- [MMCL](https://github.com/paulhager/MMCL-Tabular-Imaging)
