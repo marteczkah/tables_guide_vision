@@ -31,6 +31,14 @@ And for DVM:
 ```
 python train_tgv.py -p train_paths_all_views.pt --tabular_train_path dvm_features_train_noOH_all_views_physical_labeled.csv -v val_paths_all_views.pt --tabular_val_path dvm_features_train_noOH_all_views_physical_labeled.csv -b 512 -e 500 -t 0.1 -s 'tgv_dvm' -l 1e-4 -h 0.1 --augment 0.95 -d 2
 ```
+The models will be saved in the folder specified under the flag ```-s```.
+
+### Fine-tuning
+The pretrained models can be applied on classification and regression tasks. UKBB supports multilabel classification (```train_multilabel.py```) and regression ```train_regression.py -d 3```), while DVM supports multiclass classification ```train_multiclass.py```) and regression ```train_regression.py -d 2```).
+
+### Zero-shot Experiments
+The code for our zero-shot experiments (no need for further training) will be available soon. 
+
 
 
 
