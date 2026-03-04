@@ -58,7 +58,7 @@ class DVMContrastiveDataset(Dataset):
             
         return {"scan" : image, # called scan to match the UKBB training
                 'continuous' :torch.tensor(continuous, dtype=torch.float32),
-                'categorical' : torch.tensor(categorical, dtype=torch.float32),
+                'categorical' : torch.tensor(categorical, dtype=torch.float32)
                 }
     
     def encode_categorical(self, categorical):
