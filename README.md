@@ -39,8 +39,12 @@ The pretrained models can be applied on classification and regression tasks. UKB
 ### Zero-shot Experiments
 The code for our zero-shot experiments (no need for further training) will be available soon. 
 
+## Checkpoints
+We provide checkpoints for our pretrained models. The UKBB checkpoint will be released upon approval.
 
-
+Dataset | DVM | Cardiac
+--- | --- | ---
+Checkpoints | [Download](https://drive.google.com/file/d/1qU1eZV7xHNSPK-nGhXakKy5MHn867POj/view?usp=sharing) | Pending approval.
 
 
 
